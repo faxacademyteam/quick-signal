@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0b0d10">
+<title>Quick Gold Signal</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#0b0d10;color:#f5f7fa;font-family:Arial,sans-serif;min-height:100vh}
+.app{width:100%;max-width:480px;margin:auto;min-height:100vh;padding:18px 16px 22px}
+.top{text-align:center;margin:5px 0 15px;position:relative}.logo{font-size:30px}.title{font-size:21px;font-weight:800;margin-top:4px}.sub{font-size:12px;color:#8c949e;margin-top:4px}
+.settingsBtn{position:absolute;right:0;top:4px;border:1px solid #292e35;background:#15181d;color:#fff;border-radius:11px;width:42px;height:42px;font-size:20px}
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}.mode button{height:64px;border:2px solid #292e35;border-radius:15px;background:#15181d;color:#aeb5bd;font-size:18px;font-weight:800}.mode .buy.active{background:#123e2a;border-color:#20c77a;color:#42e49a}.mode .sell.active{background:#431c20;border-color:#ff5d68;color:#ff8088}
+.pricebox{background:#15181d;border:1px solid #292e35;border-radius:18px;padding:15px;text-align:center;margin-bottom:14px}.label{font-size:11px;color:#8c949e;font-weight:700;letter-spacing:1px}.price{font-size:40px;font-weight:800;min-height:48px;margin-top:4px;letter-spacing:1px}.price.placeholder{color:#4e555e}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.key{height:58px;border:1px solid #292e35;border-radius:13px;background:#171a1f;color:#fff;font-size:21px;font-weight:700}.key:active{background:#252a31;transform:scale(.98)}.key.dot{font-size:25px}.key.back{color:#aeb5bd}
+.generate{width:100%;height:58px;margin-top:13px;border:0;border-radius:14px;background:#f2f4f6;color:#0b0d10;font-size:17px;font-weight:900}.result{margin-top:14px;background:#111418;border:1px solid #292e35;border-radius:15px;padding:14px;white-space:pre-wrap;font-size:14px;line-height:1.55;min-height:112px}.copy{width:100%;height:54px;margin-top:10px;border:0;border-radius:14px;background:#176b4a;color:white;font-size:16px;font-weight:800}.status{text-align:center;color:#42e49a;font-size:12px;height:17px;margin-top:7px}.settings{text-align:center;color:#707984;font-size:10px;margin-top:16px}
+.overlay{display:none;position:fixed;inset:0;background:#000b;z-index:10;padding:14px;align-items:flex-end}.overlay.show{display:flex}.panel{width:100%;max-width:480px;margin:auto;background:#15181d;border:1px solid #292e35;border-radius:20px;padding:18px}.panelHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.panelHead h2{margin:0;font-size:20px}.close{background:none;border:0;color:#fff;font-size:25px}.row{display:grid;grid-template-columns:1fr 105px 62px;gap:8px;align-items:center;margin:10px 0}.row span{font-size:14px;font-weight:700}.row input{width:100%;padding:12px;border:1px solid #343a42;background:#0e1115;color:#fff;border-radius:10px;text-align:center;font-size:16px}.toggle{height:38px;border:0;border-radius:20px;background:#343a42;color:#aaa;font-weight:800}.toggle.on{background:#176b4a;color:#fff}.save{width:100%;padding:14px;border:0;border-radius:12px;background:#f2f4f6;color:#0b0d10;font-size:16px;font-weight:800;margin-top:14px}.note{font-size:11px;color:#7d858e;text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <button class="settingsBtn" onclick="openSettings()">⚙️</button>
+    <div class="logo">⚡</div><div class="title">Quick Gold Signal</div><div class="sub">Fast signal generator</div>
+  </div>
+  <div class="mode"><button id="buy" class="buy active" onclick="setSide('buy')">🟢 BUY NOW</button><button id="sell" class="sell" onclick="setSide('sell')">🔴 SELL NOW</button></div>
+  <div class="pricebox"><div class="label">GOLD PRICE</div><div id="price" class="price placeholder">0</div></div>
+  <div class="keypad">
+    <button class="key" onclick="key('1')">1</button><button class="key" onclick="key('2')">2</button><button class="key" onclick="key('3')">3</button>
+    <button class="key" onclick="key('4')">4</button><button class="key" onclick="key('5')">5</button><button class="key" onclick="key('6')">6</button>
+    <button class="key" onclick="key('7')">7</button><button class="key" onclick="key('8')">8</button><button class="key" onclick="key('9')">9</button>
+    <button class="key dot" onclick="key('.')">.</button><button class="key" onclick="key('0')">0</button><button class="key back" onclick="back()">⌫</button>
+  </div>
+  <button class="generate" onclick="generate(true)">⚡ GENERATE & COPY</button>
+  <div id="result" class="result">Your signal will appear here.</div>
+  <button class="copy" onclick="copySignal()">📋 COPY AGAIN</button>
+  <div id="status" class="status"></div>
+  <div id="summary" class="settings"></div>
+</div>
+
+<div id="overlay" class="overlay" onclick="if(event.target===this)closeSettings()">
+ <div class="panel">
+  <div class="panelHead"><h2>⚙️ Signal Settings</h2><button class="close" onclick="closeSettings()">×</button></div>
+  <div class="row"><span>Stop Loss (pips)</span><input id="sl" type="number" min="1" value="100"><span></span></div>
+  <div class="row"><span>TP 1 (pips)</span><input id="tp1" type="number" min="1" value="50"><button id="tp1on" class="toggle on" onclick="toggle('tp1')">ON</button></div>
+  <div class="row"><span>TP 2 (pips)</span><input id="tp2" type="number" min="1" value="100"><button id="tp2on" class="toggle on" onclick="toggle('tp2')">ON</button></div>
+  <div class="row"><span>TP 3 (pips)</span><input id="tp3" type="number" min="1" value="150"><button id="tp3on" class="toggle" onclick="toggle('tp3')">OFF</button></div>
+  <button class="save" onclick="saveSettings()">💾 SAVE SETTINGS</button>
+  <div class="note">100 Gold pips = 10.0 price points</div>
+ </div>
+</div>
+
+<script>
+let side='buy',value='';
+let cfg={sl:100,tp1:50,tp2:100,tp3:150,tp1on:true,tp2on:true,tp3on:false};
+try{let s=JSON.parse(localStorage.getItem('qgs_cfg'));if(s)cfg={...cfg,...s}}catch(e){}
+function render(){let e=document.getElementById('price');e.textContent=value||'0';e.classList.toggle('placeholder',!value)}
+function key(k){if(k==='.'&&value.includes('.'))return;if(value.length>=8)return;if(k==='.'&&!value)value='0';value+=k;render()}
+function back(){value=value.slice(0,-1);render()}
+function setSide(s){side=s;document.getElementById('buy').classList.toggle('active',s==='buy');document.getElementById('sell').classList.toggle('active',s==='sell');document.getElementById('status').textContent='';if(value)generate(false)}
+function fmt(n){return n.toFixed(1).replace(/\.0$/,'')}
+function generate(doCopy){
+ const p=Number(value),r=document.getElementById('result');if(!p){r.textContent='Enter the Gold price first.';return}
+ const sl=cfg.sl/10, targets=[['tp1',cfg.tp1],['tp2',cfg.tp2],['tp3',cfg.tp3]].filter(x=>cfg[x[0]+'on']).map(x=>side==='buy'?fmt(p+x[1]/10):fmt(p-x[1]/10));
+ let text=side==='buy'?`[BUY SIGNAL]
+================
+
+Gold Buy Now @ ${fmt(p)} 🟢 Stoploss: ${fmt(p-sl)} Take profits: ${targets.join(' / ')}`:`[SELL SIGNAL]
+================
+
+Gold Sell Now @ ${fmt(p)} 🔴 Stoploss: ${fmt(p+sl)} Take profits: ${targets.join(' / ')}`;
+ r.textContent=text;if(doCopy)copySignal();
+}
+async function copySignal(){let t=document.getElementById('result').textContent;if(!t||t==='Your signal will appear here.'||t==='Enter the Gold price first.')return;try{await navigator.clipboard.writeText(t)}catch(e){let x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove()}document.getElementById('status').textContent='✅ Copied — paste into WhatsApp'}
+function openSettings(){document.getElementById('sl').value=cfg.sl;document.getElementById('tp1').value=cfg.tp1;document.getElementById('tp2').value=cfg.tp2;document.getElementById('tp3').value=cfg.tp3;['tp1','tp2','tp3'].forEach(x=>updateToggle(x));document.getElementById('overlay').classList.add('show')}
+function closeSettings(){document.getElementById('overlay').classList.remove('show')}
+function toggle(x){cfg[x+'on']=!cfg[x+'on'];updateToggle(x)}
+function updateToggle(x){let b=document.getElementById(x+'on');b.textContent=cfg[x+'on']?'ON':'OFF';b.classList.toggle('on',cfg[x+'on'])}
+function saveSettings(){
+ cfg.sl=Math.max(1,Number(document.getElementById('sl').value)||100);cfg.tp1=Math.max(1,Number(document.getElementById('tp1').value)||50);cfg.tp2=Math.max(1,Number(document.getElementById('tp2').value)||100);cfg.tp3=Math.max(1,Number(document.getElementById('tp3').value)||150);
+ localStorage.setItem('qgs_cfg',JSON.stringify(cfg));updateSummary();closeSettings();if(value)generate(false);document.getElementById('status').textContent='✅ Settings saved'}
+function updateSummary(){let a=[];if(cfg.tp1on)a.push('TP1 '+cfg.tp1);if(cfg.tp2on)a.push('TP2 '+cfg.tp2);if(cfg.tp3on)a.push('TP3 '+cfg.tp3);document.getElementById('summary').textContent='SL '+cfg.sl+' pips • '+a.join(' • ')}
+updateSummary();render();
+</script>
+</body>
+</html>
