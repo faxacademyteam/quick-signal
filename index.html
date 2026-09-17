@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#0b0d10">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
 <title>Quick Gold Signal</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -82,6 +84,11 @@ function saveSettings(){
  localStorage.setItem('qgs_cfg',JSON.stringify(cfg));updateSummary();closeSettings();if(value)generate(false);document.getElementById('status').textContent='✅ Settings saved'}
 function updateSummary(){let a=[];if(cfg.tp1on)a.push('TP1 '+cfg.tp1);if(cfg.tp2on)a.push('TP2 '+cfg.tp2);if(cfg.tp3on)a.push('TP3 '+cfg.tp3);document.getElementById('summary').textContent='SL '+cfg.sl+' pips • '+a.join(' • ')}
 updateSummary();render();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
+}
 </script>
 </body>
 </html>
